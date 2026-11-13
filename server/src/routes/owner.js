@@ -1,0 +1,20 @@
+const express = require('express');
+const ownerAuth = require('../middleware/ownerAuth');
+const o = require('../controllers/ownerController');
+const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+const r = express.Router();
+r.use(ownerAuth); // every owner route is protected (temporary shared-secret check)
+r.get('/bookings', wrap(o.listBookings));
+r.get('/bookings/:id', wrap(o.getBooking));
+r.post('/bookings/:id/status', wrap(o.setStatus));
+r.post('/bookings/:id/route', wrap(o.updateRoute));
+r.post('/bookings/:id/quote-draft', wrap(o.createQuoteDraft));
+r.put('/quotes/:id', wrap(o.updateQuote));
+r.post('/quotes/:id/issue', wrap(o.issueQuote));
+r.get('/pricing-settings', wrap(o.getSettings));
+r.put('/pricing-settings', wrap(o.putSettings));
+r.get('/vehicles', wrap(o.listVehicles)); r.post('/vehicles', wrap(o.createVehicle)); r.patch('/vehicles/:id', wrap(o.patchVehicle));
+r.get('/drivers', wrap(o.listDrivers)); r.post('/drivers', wrap(o.createDriver)); r.patch('/drivers/:id', wrap(o.patchDriver));
+r.get('/availability', wrap(o.availability));
+r.post('/reservations', wrap(o.createReservation));
+module.exports = r;
